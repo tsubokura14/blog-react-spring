@@ -1,4 +1,4 @@
-# blog_react_spring(SpringLog 仮称)
+# blog-react-spring
 
 React(フロントエンド) + Spring Boot(バックエンド) + PostgreSQL(DB) を使った、認証付きブログ/掲示板アプリ。
 ユーザー・投稿・コメント・タグといった機能を通じて、Spring Bootの機能を一通り学ぶことを目的とする。
