@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:17 # 最新安定板
+    environment: 
+      POSTGRES_DB: ${POSTGRES_DB} # 作成するDB名
+      POSTGRES_USER: ${POSTGRES_USER} # 接続ユーザー名
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # パスワード
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # DBのボリュームをトップレベルのボリュームに紐づけ
+
+  backend:
+    build: ./backend # backend/Dockerfileを使ってイメージをビルドする
+    ports: 
+      - 8080:8080  # ホストの8080番 : コンテナ内の8080番(Spring Bootのデフォルトポート)を繋ぐ
+    environment:
+      # application.propertiesのdatasource設定を環境変数で上書きしている
+      # ホスト名はlocalhostではなくサービス名"db"、ポートは公開用の5433ではなくコンテナ内部の5432を使う
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - db # dbサービスの後にbackendを起動する(起動順序のみ制御。DBの起動完了までは待たない点に注意)
+
+volumes:
+  postgres_data: # ボリュームを作成
