@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.PostCreateRequest;
 import com.example.demo.dto.PostResponse;
 import com.example.demo.entity.Post;
+import com.example.demo.exception.PostNotFoundException;
 import com.example.demo.repository.PostRepository;
 
 // @Serviceを付けることでDIコンテナに登録され、
@@ -60,10 +61,10 @@ public class PostService {
 		// 値が存在すればその中身のPostを取り出し、
 		// 存在しなければorElseThrow()で例外を投げて処理を中断する
 		//
-		// 見つからない場合は例外を投げる(本来は@ControllerAdviceで共通ハンドリングすべきだが、
-		// それはPhase 2後半のタスクなので今は仮の例外を投げるだけにしている)
+		// 見つからない場合はPostNotFoundExceptionを投げる。
+		// GlobalExceptionHandlerがこれを捕まえて404に変換する
 		Post post = postRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("Post not found: id=" + id));
+				.orElseThrow(() -> new PostNotFoundException(id));
 
 		// 見つかったentityをDTOに変換して返す
 		return PostResponse.from(post);
@@ -71,9 +72,9 @@ public class PostService {
 
 	// 投稿を1件更新する処理
 	public PostResponse update(Long id, PostCreateRequest request) {
-		// 更新対象が存在しなければ例外(findByIdと同様の理由で仮の例外)
+		// 更新対象が存在しなければPostNotFoundException(findByIdと同様)
 		Post post = postRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("Post not found: id=" + id));
+				.orElseThrow(() -> new PostNotFoundException(id));
 
 		// findByIdの戻り値はこのメソッドを抜けると永続化コンテキストの外に出る(detached)ため、
 		// フィールドを書き換えるだけでは自動的にUPDATEされない。
@@ -90,7 +91,7 @@ public class PostService {
 		// deleteById()は対象が存在しなくても例外を投げないため、
 		// 事前にexistsById()で存在確認をしてから削除している
 		if (!postRepository.existsById(id)) {
-			throw new IllegalArgumentException("Post not found: id=" + id);
+			throw new PostNotFoundException(id);
 		}
 		postRepository.deleteById(id);
 	}
