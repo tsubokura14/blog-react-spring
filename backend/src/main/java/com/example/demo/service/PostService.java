@@ -69,4 +69,30 @@ public class PostService {
 		return PostResponse.from(post);
 	}
 
+	// 投稿を1件更新する処理
+	public PostResponse update(Long id, PostCreateRequest request) {
+		// 更新対象が存在しなければ例外(findByIdと同様の理由で仮の例外)
+		Post post = postRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("Post not found: id=" + id));
+
+		// findByIdの戻り値はこのメソッドを抜けると永続化コンテキストの外に出る(detached)ため、
+		// フィールドを書き換えるだけでは自動的にUPDATEされない。
+		// 明示的にsave()を呼ぶことで、idが既存なのでINSERTではなくUPDATEが発行される
+		post.setTitle(request.getTitle());
+		post.setBody(request.getBody());
+		Post updated = postRepository.save(post);
+
+		return PostResponse.from(updated);
+	}
+
+	// 投稿を1件削除する処理
+	public void delete(Long id) {
+		// deleteById()は対象が存在しなくても例外を投げないため、
+		// 事前にexistsById()で存在確認をしてから削除している
+		if (!postRepository.existsById(id)) {
+			throw new IllegalArgumentException("Post not found: id=" + id);
+		}
+		postRepository.deleteById(id);
+	}
+
 }
