@@ -51,7 +51,7 @@ class PostControllerTest {
 	@DisplayName("投稿一覧を取得すると、Serviceが返したPostResponseの内容がそのままJSONで返る")
 	void findAll_returnsAllPosts() throws Exception {
 		// 準備: postService.findAll()が呼ばれたら、PostResponseを1件持つリストを返すよう固定する
-		when(postService.findAll()).thenReturn(List.of(new PostResponse(1L, "test", "hello")));
+		when(postService.findAll()).thenReturn(List.of(new PostResponse(1L, "test", "hello", 0)));
 
 		// 実行: GET /postsを擬似的に送信し、その結果を検証する
 		mockMvc.perform(get("/posts"))
@@ -65,7 +65,7 @@ class PostControllerTest {
 	@DisplayName("存在するidを指定すると、該当する投稿が200で返る")
 	void findById_returnsPostWhenExists() throws Exception {
 		// 準備: id=1で呼ばれたときだけ、対応するPostResponseを返すよう固定する
-		when(postService.findById(1L)).thenReturn(new PostResponse(1L, "test", "hello"));
+		when(postService.findById(1L)).thenReturn(new PostResponse(1L, "test", "hello", 0));
 
 		mockMvc.perform(get("/posts/1"))
 				.andExpect(status().isOk())
@@ -97,7 +97,7 @@ class PostControllerTest {
 
 		// 準備: create()にどんなPostCreateRequestが渡されても(any)、固定のPostResponseを返す
 		when(postService.create(any(PostCreateRequest.class)))
-				.thenReturn(new PostResponse(2L, "validation test", "hello"));
+				.thenReturn(new PostResponse(2L, "validation test", "hello", 0));
 
 		// 実行: POST /postsにJSON化したrequestをボディとして送信する
 		mockMvc.perform(post("/posts")
@@ -136,7 +136,7 @@ class PostControllerTest {
 		// 準備: 第1引数はeq(1L)でid=1のときだけに限定し、第2引数はany(...)で内容を問わず一致させる。
 		// このように引数マッチャー(eq/any)を1つでも使ったら、他の引数も全てマッチャーで書く必要がある
 		when(postService.update(eq(1L), any(PostCreateRequest.class)))
-				.thenReturn(new PostResponse(1L, "updated", "updated body"));
+				.thenReturn(new PostResponse(1L, "updated", "updated body", 0));
 
 		mockMvc.perform(put("/posts/1")
 						.contentType(MediaType.APPLICATION_JSON)

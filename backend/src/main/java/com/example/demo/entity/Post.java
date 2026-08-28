@@ -1,9 +1,13 @@
 package com.example.demo.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 // @Entityを付けることで、このクラスがJPAの管理対象(=DBのテーブルと対応するクラス)になる。
 // クラス名"Post"がそのままテーブル名"post"に対応し、
@@ -25,6 +29,14 @@ public class Post {
 
 	// 投稿の本文
 	private String body;
+
+	// mappedBy = "post" は、外部キー(post_id)の管理を
+	// Comment側の@ManyToOne(post)フィールドに任せている、という意味。
+	// @OneToManyのデフォルトのfetchはLAZYなので明示していないが、
+	// これがN+1問題を引き起こす原因になる(comments.size()等を呼んだ瞬間に
+	// このPost 1件分だけのSELECTが追加で発行される)
+	@OneToMany(mappedBy = "post")
+	private List<Comment> comments = new ArrayList<>();
 
 	// JPAはgetter/setter経由でフィールドを読み書きするため用意している
 	public Long getId() {
@@ -49,6 +61,10 @@ public class Post {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public List<Comment> getComments() {
+		return comments;
 	}
 
 }
