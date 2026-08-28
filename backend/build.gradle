@@ -20,6 +20,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// JavaのコードからDBを操作できるようにするライブラリ郡
@@ -31,6 +32,10 @@ dependencies {
 
 	// JavaアプリがPostgreSQLと通信するためのドライバ
 	runtimeOnly 'org.postgresql:postgresql'
+
+	// @DataJpaTestがテスト用に自動的に差し替える組み込みDB。
+	// 実際のPostgreSQLを起動しなくても、Repositoryのテストだけを高速に実行できる
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
