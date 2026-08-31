@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponse;
@@ -28,6 +29,8 @@ public class CommentService {
 	}
 
 	// 投稿へのコメントを1件作成する処理
+	// Post実在確認(SELECT)とコメント保存(INSERT)の2つのDB操作を1つのトランザクションにまとめるため@Transactionalを付与
+	@Transactional
 	public CommentResponse create(Long postId, CommentCreateRequest request) {
 		// 存在しないpostIdへのコメント作成を防ぐため、先にPostの実在確認をする。
 		// 見つかった場合、そのPostをCommentのpostフィールドにそのまま紐づける
