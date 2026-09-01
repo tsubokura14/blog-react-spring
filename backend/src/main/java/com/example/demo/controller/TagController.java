@@ -14,8 +14,9 @@ import com.example.demo.dto.TagCreateRequest;
 import com.example.demo.dto.TagResponse;
 import com.example.demo.service.TagService;
 
+// APIを/api配下に分離している理由はPostControllerのコメントを参照
 @RestController
-@RequestMapping("/tags")
+@RequestMapping("/api/tags")
 public class TagController {
 
 	private final TagService tagService;

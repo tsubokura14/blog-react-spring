@@ -19,9 +19,10 @@ import com.example.demo.service.PostService;
 
 // @RestControllerは@Controller + @ResponseBodyを兼ねており、
 // 戻り値を自動的にJSONへ変換してレスポンスボディに書き込む
-// @RequestMapping("/posts")でこのクラス配下のURLのベースパスを指定している
+// @RequestMapping("/api/posts")でこのクラス配下のURLのベースパスを指定している。
+// frontendのSPAルート(例: /posts/new)とAPIパスが衝突しないよう、APIは/api配下に分離している
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 public class PostController {
 
 	private final PostService postService;

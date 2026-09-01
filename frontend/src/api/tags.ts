@@ -1,4 +1,5 @@
-const API_BASE_URL = '';
+// backendのAPIを/api配下に分離している理由はapi/posts.tsのコメントを参照
+const API_BASE_URL = '/api';
 
 // backendのTagResponse(id/name)と対応する型
 export type Tag = {

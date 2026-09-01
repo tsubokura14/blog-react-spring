@@ -54,7 +54,7 @@ class PostControllerTest {
 		when(postService.findAll()).thenReturn(List.of(new PostResponse(1L, "test", "hello", 0, List.of())));
 
 		// 実行: GET /postsを擬似的に送信し、その結果を検証する
-		mockMvc.perform(get("/posts"))
+		mockMvc.perform(get("/api/posts"))
 				.andExpect(status().isOk())
 				// jsonPathでレスポンスJSONの中身をピンポイントに検証(配列の0番目)
 				.andExpect(jsonPath("$[0].id").value(1))
@@ -67,7 +67,7 @@ class PostControllerTest {
 		// 準備: id=1で呼ばれたときだけ、対応するPostResponseを返すよう固定する
 		when(postService.findById(1L)).thenReturn(new PostResponse(1L, "test", "hello", 0, List.of()));
 
-		mockMvc.perform(get("/posts/1"))
+		mockMvc.perform(get("/api/posts/1"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(1))
 				.andExpect(jsonPath("$.title").value("test"));
@@ -81,7 +81,7 @@ class PostControllerTest {
 
 		// PostServiceが投げたPostNotFoundExceptionをGlobalExceptionHandlerが捕まえ、
 		// 404 + ErrorResponseに変換されることを確認する
-		mockMvc.perform(get("/posts/999"))
+		mockMvc.perform(get("/api/posts/999"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.status").value(404))
 				.andExpect(jsonPath("$.message").value("Post not found: id=999"));
@@ -100,7 +100,7 @@ class PostControllerTest {
 				.thenReturn(new PostResponse(2L, "validation test", "hello", 0, List.of()));
 
 		// 実行: POST /postsにJSON化したrequestをボディとして送信する
-		mockMvc.perform(post("/posts")
+		mockMvc.perform(post("/api/posts")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isOk())
@@ -119,7 +119,7 @@ class PostControllerTest {
 		// このテストではpostService.create()をwhen(...)で設定していない点に注意。
 		// title未入力は@NotBlankでコントローラに届く前(バリデーション)で弾かれるため、
 		// Service(モック)の呼び出しまで到達しない
-		mockMvc.perform(post("/posts")
+		mockMvc.perform(post("/api/posts")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
@@ -138,7 +138,7 @@ class PostControllerTest {
 		when(postService.update(eq(1L), any(PostCreateRequest.class)))
 				.thenReturn(new PostResponse(1L, "updated", "updated body", 0, List.of()));
 
-		mockMvc.perform(put("/posts/1")
+		mockMvc.perform(put("/api/posts/1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isOk())
@@ -149,7 +149,7 @@ class PostControllerTest {
 	@DisplayName("存在するidを指定して削除すると、200が返りServiceのdelete()が呼ばれる")
 	void delete_returns200AndCallsServiceWhenExists() throws Exception {
 		// delete()は戻り値がvoidなのでwhen(...)での準備は不要。実行だけ先に行う
-		mockMvc.perform(delete("/posts/1"))
+		mockMvc.perform(delete("/api/posts/1"))
 				.andExpect(status().isOk());
 
 		// 戻り値で検証できない代わりに、postService.delete(1L)が実際に呼ばれたことを確認する
@@ -163,7 +163,7 @@ class PostControllerTest {
 		// 代わりにdoThrow(...).when(モック).メソッド(...)という順番で「例外を投げる」ことを設定する
 		doThrow(new PostNotFoundException(999L)).when(postService).delete(999L);
 
-		mockMvc.perform(delete("/posts/999"))
+		mockMvc.perform(delete("/api/posts/999"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message").value("Post not found: id=999"));
 	}

@@ -53,7 +53,7 @@ class CommentControllerTest {
 		when(commentService.create(eq(1L), any(CommentCreateRequest.class)))
 				.thenReturn(new CommentResponse(1L, "tsubo", "hello", LocalDateTime.now()));
 
-		mockMvc.perform(post("/posts/1/comments")
+		mockMvc.perform(post("/api/posts/1/comments")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isOk())
@@ -68,7 +68,7 @@ class CommentControllerTest {
 		request.setAuthor("");
 		request.setBody("hello");
 
-		mockMvc.perform(post("/posts/1/comments")
+		mockMvc.perform(post("/api/posts/1/comments")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
@@ -85,7 +85,7 @@ class CommentControllerTest {
 		when(commentService.create(eq(999L), any(CommentCreateRequest.class)))
 				.thenThrow(new PostNotFoundException(999L));
 
-		mockMvc.perform(post("/posts/999/comments")
+		mockMvc.perform(post("/api/posts/999/comments")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isNotFound())
@@ -98,7 +98,7 @@ class CommentControllerTest {
 		when(commentService.findAllByPostId(1L))
 				.thenReturn(List.of(new CommentResponse(1L, "tsubo", "hello", LocalDateTime.now())));
 
-		mockMvc.perform(get("/posts/1/comments"))
+		mockMvc.perform(get("/api/posts/1/comments"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].id").value(1))
 				.andExpect(jsonPath("$[0].author").value("tsubo"));
@@ -109,7 +109,7 @@ class CommentControllerTest {
 	void findAll_returns404WhenPostNotFound() throws Exception {
 		when(commentService.findAllByPostId(999L)).thenThrow(new PostNotFoundException(999L));
 
-		mockMvc.perform(get("/posts/999/comments"))
+		mockMvc.perform(get("/api/posts/999/comments"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message").value("Post not found: id=999"));
 	}
@@ -117,7 +117,7 @@ class CommentControllerTest {
 	@Test
 	@DisplayName("存在するcommentIdを指定して削除すると、200が返りServiceのdelete()が呼ばれる")
 	void delete_returns200AndCallsServiceWhenExists() throws Exception {
-		mockMvc.perform(delete("/posts/1/comments/1"))
+		mockMvc.perform(delete("/api/posts/1/comments/1"))
 				.andExpect(status().isOk());
 
 		verify(commentService).delete(1L, 1L);
@@ -128,7 +128,7 @@ class CommentControllerTest {
 	void delete_returns404WhenNotFound() throws Exception {
 		doThrow(new CommentNotFoundException(999L)).when(commentService).delete(1L, 999L);
 
-		mockMvc.perform(delete("/posts/1/comments/999"))
+		mockMvc.perform(delete("/api/posts/1/comments/999"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message").value("Comment not found: id=999"));
 	}

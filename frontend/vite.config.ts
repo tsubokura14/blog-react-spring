@@ -9,9 +9,11 @@ export default defineConfig({
     // ブラウザからは同一オリジン(localhost:5173)へのリクエストに見えるため、
     // backend側でCORSを許可しなくてもローカル開発中はエラーにならない。
     // 本番相当のCORS設定はdocs/overview/ロードマップ.mdのPhase 7で扱う
+    //
+    // /api配下だけをbackendへ転送する。backendのAPIを/apiに分離しているのは、
+    // frontendのSPAルート(例: /posts/new)とパスが衝突しないようにするため
     proxy: {
-      '/posts': 'http://localhost:8080',
-      '/tags': 'http://localhost:8080',
+      '/api': 'http://localhost:8080',
     },
   },
 })
