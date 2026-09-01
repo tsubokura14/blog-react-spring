@@ -6,6 +6,7 @@ import { buttonClass } from '../components/Button';
 
 const errorClass = 'rounded border-l-4 border-error bg-error-bg text-error px-3 py-2.5';
 const h1Class = 'text-[32px] font-medium tracking-[-0.5px] text-text-h mt-6 mb-4';
+const tagPillClass = 'inline-block rounded-full bg-accent/10 text-accent text-xs font-medium px-2.5 py-1';
 
 function PostListPage() {
   const { data: posts, isLoading, error } = useAsync(() => fetchPosts(), []);
@@ -44,6 +45,15 @@ function PostListPage() {
               <Link to={`/posts/${post.id}`} className="block font-medium text-text-h no-underline hover:text-accent">
                 {post.title}
               </Link>
+              {post.tags.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {post.tags.map((tag) => (
+                    <span key={tag.id} className={tagPillClass}>
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>

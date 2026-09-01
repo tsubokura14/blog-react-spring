@@ -11,6 +11,7 @@ export default defineConfig({
     // 本番相当のCORS設定はdocs/overview/ロードマップ.mdのPhase 7で扱う
     proxy: {
       '/posts': 'http://localhost:8080',
+      '/tags': 'http://localhost:8080',
     },
   },
 })
