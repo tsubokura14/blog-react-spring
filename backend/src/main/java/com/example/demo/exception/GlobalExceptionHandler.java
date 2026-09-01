@@ -2,6 +2,7 @@ package com.example.demo.exception;
 
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +23,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
 	}
 
+	// CommentServiceが投げるCommentNotFoundExceptionをここで捕まえ、404として返す
+	@ExceptionHandler(CommentNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex) {
+		ErrorResponse body = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+	}
+
 	// @Valid付きの引数でBean Validation(@NotBlank等)違反があると、
 	// Spring MVCがMethodArgumentNotValidExceptionを投げる。
 	// ここで各フィールドの違反内容(ex.getBindingResult())を取り出し、
@@ -32,6 +40,14 @@ public class GlobalExceptionHandler {
 				.map(error -> error.getField() + ": " + error.getDefaultMessage())
 				.collect(Collectors.joining(", "));
 		ErrorResponse body = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+	}
+
+	// 同名タグの登録などDB制約(unique等)違反時にSpringが投げる例外。
+	// DB由来の詳細なメッセージ(SQL文の一部等)をそのまま返さず、汎用的なメッセージに変換する
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+		ErrorResponse body = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "constraint violation: duplicate or invalid value");
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
 	}
 

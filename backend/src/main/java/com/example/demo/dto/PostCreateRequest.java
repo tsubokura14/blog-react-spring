@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -23,6 +25,9 @@ public class PostCreateRequest {
 	@NotBlank(message = "body is required")
 	private String body;
 
+	// 紐付けるタグのidの一覧。未指定(null)や存在しないidが含まれる場合はService側で無視する
+	private List<Long> tagIds;
+
 	// JacksonがJSONのキーとこのgetter/setterの名前(title/body)を対応付けて、
 	// JSON文字列 → PostCreateRequestインスタンスへの変換に使う
 	public String getTitle() {
@@ -39,6 +44,14 @@ public class PostCreateRequest {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public List<Long> getTagIds() {
+		return tagIds;
+	}
+
+	public void setTagIds(List<Long> tagIds) {
+		this.tagIds = tagIds;
 	}
 
 }
