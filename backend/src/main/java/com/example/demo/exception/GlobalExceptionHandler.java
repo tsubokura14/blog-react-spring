@@ -2,6 +2,7 @@ package com.example.demo.exception;
 
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,6 +40,14 @@ public class GlobalExceptionHandler {
 				.map(error -> error.getField() + ": " + error.getDefaultMessage())
 				.collect(Collectors.joining(", "));
 		ErrorResponse body = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+	}
+
+	// 同名タグの登録などDB制約(unique等)違反時にSpringが投げる例外。
+	// DB由来の詳細なメッセージ(SQL文の一部等)をそのまま返さず、汎用的なメッセージに変換する
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+		ErrorResponse body = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "constraint violation: duplicate or invalid value");
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
 	}
 

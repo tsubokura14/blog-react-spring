@@ -1,14 +1,18 @@
 package com.example.demo.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PostCreateRequest;
 import com.example.demo.dto.PostResponse;
 import com.example.demo.entity.Post;
+import com.example.demo.entity.Tag;
 import com.example.demo.exception.PostNotFoundException;
 import com.example.demo.repository.PostRepository;
+import com.example.demo.repository.TagRepository;
 
 // @Serviceを付けることでDIコンテナに登録され、
 // ControllerからPostServiceをコンストラクタ引数として受け取れるようになる
@@ -19,8 +23,11 @@ public class PostService {
 	// (フィールドに直接@Autowiredするより、不変(final)にできる・テストで差し替えやすいという利点がある)
 	private final PostRepository postRepository;
 
-	public PostService(PostRepository postRepository) {
+	private final TagRepository tagRepository;
+
+	public PostService(PostRepository postRepository, TagRepository tagRepository) {
 		this.postRepository = postRepository;
+		this.tagRepository = tagRepository;
 	}
 
 	// 投稿を1件作成する処理
@@ -35,6 +42,7 @@ public class PostService {
 		// entityのフィールドにコピーしている
 		post.setTitle(request.getTitle());
 		post.setBody(request.getBody());
+		post.setTags(resolveTags(request.getTagIds()));
 
 		// (3) repository.save()を呼んだ瞬間にDBへのINSERTが発行される。
 		// 戻り値の saved は、DBが払い出したid(自動採番)が入った状態のPostになっている
@@ -81,6 +89,7 @@ public class PostService {
 		// 明示的にsave()を呼ぶことで、idが既存なのでINSERTではなくUPDATEが発行される
 		post.setTitle(request.getTitle());
 		post.setBody(request.getBody());
+		post.setTags(resolveTags(request.getTagIds()));
 		Post updated = postRepository.save(post);
 
 		return PostResponse.from(updated);
@@ -94,6 +103,15 @@ public class PostService {
 			throw new PostNotFoundException(id);
 		}
 		postRepository.deleteById(id);
+	}
+
+	// tagIdsに対応する既存のTagを取得する。
+	// 未指定(null)なら空集合、存在しないidが含まれていても無視して見つかった分だけ紐付ける
+	private Set<Tag> resolveTags(List<Long> tagIds) {
+		if (tagIds == null || tagIds.isEmpty()) {
+			return new HashSet<>();
+		}
+		return new HashSet<>(tagRepository.findAllById(tagIds));
 	}
 
 }

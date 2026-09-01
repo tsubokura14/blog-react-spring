@@ -1,12 +1,17 @@
 package com.example.demo.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 // @Entityを付けることで、このクラスがJPAの管理対象(=DBのテーブルと対応するクラス)になる。
@@ -38,6 +43,16 @@ public class Post {
 	@OneToMany(mappedBy = "post")
 	private List<Comment> comments = new ArrayList<>();
 
+	// Post:Tag = 多対多。中間テーブルpost_tagの管理をPost側(このフィールド)に持たせている単方向関連
+	// (Tag側からPostを辿る必要が無いため、Tag側にmappedByの@ManyToManyは用意していない)
+	@ManyToMany
+	@JoinTable(
+			name = "post_tag",
+			joinColumns = @JoinColumn(name = "post_id"),
+			inverseJoinColumns = @JoinColumn(name = "tag_id")
+	)
+	private Set<Tag> tags = new HashSet<>();
+
 	// JPAはgetter/setter経由でフィールドを読み書きするため用意している
 	public Long getId() {
 		return id;
@@ -65,6 +80,14 @@ public class Post {
 
 	public List<Comment> getComments() {
 		return comments;
+	}
+
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
 	}
 
 }
