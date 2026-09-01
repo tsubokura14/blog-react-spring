@@ -1,20 +1,24 @@
+import type { Tag } from './tags';
+
 // 空文字にして相対パス(/posts)でリクエストする。
 // 実際の送信先はvite.config.tsのserver.proxyがhttp://localhost:8080へ転送する
 // (ブラウザからは同一オリジンへのリクエストに見えるため、CORS設定が不要になる)
 const API_BASE_URL = '';
 
-// backendのPostResponse(id/title/body)と対応する型。
+// backendのPostResponse(id/title/body/tags)と対応する型。
 // PUT/DELETEはこのブランチのbackendにまだ無いため、この層でも扱っていない
 export type Post = {
   id: number;
   title: string;
   body: string;
+  tags: Tag[];
 };
 
-// backendのPostCreateRequest(title/body)と対応する型
+// backendのPostCreateRequest(title/body/tagIds)と対応する型
 export type PostCreateInput = {
   title: string;
   body: string;
+  tagIds?: number[];
 };
 
 // GET /posts (一覧取得)
