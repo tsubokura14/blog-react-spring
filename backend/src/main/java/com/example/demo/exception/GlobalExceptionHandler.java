@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
 	}
 
+	// CommentServiceが投げるCommentNotFoundExceptionをここで捕まえ、404として返す
+	@ExceptionHandler(CommentNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex) {
+		ErrorResponse body = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+	}
+
 	// @Valid付きの引数でBean Validation(@NotBlank等)違反があると、
 	// Spring MVCがMethodArgumentNotValidExceptionを投げる。
 	// ここで各フィールドの違反内容(ex.getBindingResult())を取り出し、

@@ -10,6 +10,7 @@ import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponse;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
+import com.example.demo.exception.CommentNotFoundException;
 import com.example.demo.exception.PostNotFoundException;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
@@ -58,6 +59,20 @@ public class CommentService {
 		return commentRepository.findByPostId(postId).stream()
 				.map(CommentResponse::from)
 				.toList();
+	}
+
+	// 投稿に紐づくコメントを1件削除する処理
+	public void delete(Long postId, Long commentId) {
+		Comment comment = commentRepository.findById(commentId)
+				.orElseThrow(() -> new CommentNotFoundException(commentId));
+
+		// commentIdは存在していても、指定されたpostIdに属していない場合は
+		// 「このURL上には存在しない」として404扱いにする
+		if (!comment.getPost().getId().equals(postId)) {
+			throw new CommentNotFoundException(commentId);
+		}
+
+		commentRepository.deleteById(commentId);
 	}
 
 }
