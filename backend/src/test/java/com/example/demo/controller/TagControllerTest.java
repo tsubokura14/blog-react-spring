@@ -45,7 +45,7 @@ class TagControllerTest {
 
 		when(tagService.create(any(TagCreateRequest.class))).thenReturn(new TagResponse(1L, "tech"));
 
-		mockMvc.perform(post("/tags")
+		mockMvc.perform(post("/api/tags")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isOk())
@@ -59,7 +59,7 @@ class TagControllerTest {
 		TagCreateRequest request = new TagCreateRequest();
 		request.setName("");
 
-		mockMvc.perform(post("/tags")
+		mockMvc.perform(post("/api/tags")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
@@ -75,7 +75,7 @@ class TagControllerTest {
 		when(tagService.create(any(TagCreateRequest.class)))
 				.thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint"));
 
-		mockMvc.perform(post("/tags")
+		mockMvc.perform(post("/api/tags")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(request)))
 				.andExpect(status().isBadRequest())
@@ -87,7 +87,7 @@ class TagControllerTest {
 	void findAll_returnsAllTags() throws Exception {
 		when(tagService.findAll()).thenReturn(List.of(new TagResponse(1L, "tech"), new TagResponse(2L, "diary")));
 
-		mockMvc.perform(get("/tags"))
+		mockMvc.perform(get("/api/tags"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].name").value("tech"))
 				.andExpect(jsonPath("$[1].name").value("diary"));

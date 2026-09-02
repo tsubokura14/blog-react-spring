@@ -16,10 +16,11 @@ import com.example.demo.dto.CommentCreateRequest;
 import com.example.demo.dto.CommentResponse;
 import com.example.demo.service.CommentService;
 
-// "/posts/{postId}/comments" というURLで、
-// 「どの投稿に対するコメントか」をパスの時点で明確にしている
+// "/api/posts/{postId}/comments" というURLで、
+// 「どの投稿に対するコメントか」をパスの時点で明確にしている。
+// APIを/api配下に分離している理由はPostControllerのコメントを参照
 @RestController
-@RequestMapping("/posts/{postId}/comments")
+@RequestMapping("/api/posts/{postId}/comments")
 public class CommentController {
 
 	private final CommentService commentService;

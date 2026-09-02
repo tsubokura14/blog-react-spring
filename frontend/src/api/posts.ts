@@ -1,9 +1,11 @@
 import type { Tag } from './tags';
 
-// 空文字にして相対パス(/posts)でリクエストする。
+// '/api'を付けて相対パス(/api/posts)でリクエストする。
+// backendのAPIを/api配下に分離しているのは、frontendのSPAルート(例: /posts/new)と
+// パスが衝突しないようにするため(vite.config.tsのプロキシ/Nginxのルーティングもこれに合わせて/apiだけを対象にする)。
 // 実際の送信先はvite.config.tsのserver.proxyがhttp://localhost:8080へ転送する
 // (ブラウザからは同一オリジンへのリクエストに見えるため、CORS設定が不要になる)
-const API_BASE_URL = '';
+const API_BASE_URL = '/api';
 
 // backendのPostResponse(id/title/body/tags)と対応する型。
 // PUT/DELETEはこのブランチのbackendにまだ無いため、この層でも扱っていない
